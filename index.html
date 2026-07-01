@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Automatizace procesů a AI řešení pro firmy. Vracíme stovky hodin měsíčně – bez chyb, 24/7, s maximální efektivitou.">
+  <title>AUTOM8 | AI automatizace pro firmy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            navy: { DEFAULT: '#0F172A', light: '#1E3A8A' },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    /* ── Scroll snapping ── */
+    html, body { height: 100%; margin: 0; }
+
+    #snap-container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .snap-section {
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;       /* vertically center content within the section */
+      padding-top: clamp(5rem, 8vh, 7rem);
+      padding-bottom: clamp(3rem, 6vh, 5rem);
+    }
+
+    /* Inner content wrapper gets identical breathing room on every section */
+    .snap-section > * {
+      width: 100%;
+    }
+
+    /* On mobile: disable snap so content scrolls freely, but keep generous spacing */
+    @media (max-width: 767px) {
+      #snap-container {
+        scroll-snap-type: none;
+      }
+      .snap-section {
+        min-height: auto;
+        scroll-snap-align: none;
+        justify-content: flex-start;
+        padding-top: 6rem;
+        padding-bottom: 4rem;
+      }
+    }
+
+    /* ── Animations ── */
+    [data-animate] {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    [data-animate].visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── Accordion ── */
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .accordion-item.open .accordion-content { max-height: 300px; }
+    .accordion-item.open .accordion-icon { transform: rotate(180deg); }
+    .accordion-icon { transition: transform 0.3s ease; }
+
+    /* ── Nav blur ── */
+    .nav-scrolled {
+      background: rgb(226, 232, 240);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1px 3px rgba(15,23,42,0.08);
+    }
+
+    /* ── Hero glow ── */
+    .hero-glow {
+      background: radial-gradient(ellipse at 50% 0%, rgba(30,58,138,0.06) 0%, transparent 65%);
+    }
+
+    /* ── Symmetric top/bottom breathing room for the whole page ── */
+    #snap-container::before {
+      content: "";
+      display: block;
+      height: clamp(1.5rem, 4vh, 3rem);
+    }
+    footer {
+      padding-top: clamp(3rem, 6vh, 5rem);
+      padding-bottom: clamp(3rem, 6vh, 5rem) !important;
+    }
+  </style>
+</head>
+<body class="font-sans text-slate-600 bg-slate-200 antialiased">
+
+  <!-- Navigation -->
+  <header id="navbar" class="fixed inset-x-0 top-0 z-50 bg-slate-200 border-b border-slate-300/60 shadow-sm transition-all duration-300">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 lg:h-20">
+
+        <!-- Logo -->
+        <a href="#" id="logo-link" class="inline-flex w-fit leading-none hover:opacity-75 transition-opacity shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="100" height="32" viewBox="474 662 552 174" preserveAspectRatio="xMidYMid meet" aria-label="AUTOM8" class="block pointer-events-none"><g fill="#1e3a8a"><g transform="translate(474.187487, 799.278007)"><path d="M 67.03125 0 L 60.453125 -21.625 L 27.328125 -21.625 L 20.75 0 L 0 0 L 32.0625 -91.203125 L 55.609375 -91.203125 L 87.78125 0 Z M 55.84375 -37.765625 L 49.265625 -58.890625 C 48.847656 -60.304688 48.296875 -62.117188 47.609375 -64.328125 C 46.929688 -66.546875 46.25 -68.800781 45.5625 -71.09375 C 44.882812 -73.394531 44.335938 -75.394531 43.921875 -77.09375 C 43.503906 -75.394531 42.929688 -73.289062 42.203125 -70.78125 C 41.484375 -68.28125 40.789062 -65.910156 40.125 -63.671875 C 39.46875 -61.441406 38.992188 -59.847656 38.703125 -58.890625 L 32.1875 -37.765625 Z M 55.84375 -37.765625 "/></g><g transform="translate(561.969054, 799.278007)"><path d="M 85.359375 -90.828125 L 85.359375 -32.0625 C 85.359375 -25.800781 83.976562 -20.15625 81.21875 -15.125 C 78.46875 -10.09375 74.304688 -6.101562 68.734375 -3.15625 C 63.171875 -0.21875 56.164062 1.25 47.71875 1.25 C 35.707031 1.25 26.550781 -1.8125 20.25 -7.9375 C 13.957031 -14.070312 10.8125 -22.195312 10.8125 -32.3125 L 10.8125 -90.828125 L 30 -90.828125 L 30 -35.21875 C 30 -27.726562 31.53125 -22.46875 34.59375 -19.4375 C 37.664062 -16.414062 42.203125 -14.90625 48.203125 -14.90625 C 52.429688 -14.90625 55.859375 -15.628906 58.484375 -17.078125 C 61.117188 -18.535156 63.054688 -20.773438 64.296875 -23.796875 C 65.546875 -26.816406 66.171875 -30.664062 66.171875 -35.34375 L 66.171875 -90.828125 Z M 85.359375 -90.828125 "/></g><g transform="translate(658.137388, 799.278007)"><path d="M 46.46875 0 L 27.21875 0 L 27.21875 -74.796875 L 2.546875 -74.796875 L 2.546875 -90.828125 L 71.140625 -90.828125 L 71.140625 -74.796875 L 46.46875 -74.796875 Z M 46.46875 0 "/></g><g transform="translate(731.816745, 799.278007)"><path d="M 93.875 -45.53125 C 93.875 -38.539062 93.003906 -32.175781 91.265625 -26.4375 C 89.523438 -20.695312 86.882812 -15.753906 83.34375 -11.609375 C 79.800781 -7.472656 75.316406 -4.296875 69.890625 -2.078125 C 64.460938 0.140625 58.046875 1.25 50.640625 1.25 C 43.222656 1.25 36.800781 0.140625 31.375 -2.078125 C 25.945312 -4.296875 21.460938 -7.472656 17.921875 -11.609375 C 14.378906 -15.753906 11.738281 -20.703125 10 -26.453125 C 8.257812 -32.210938 7.390625 -38.613281 7.390625 -45.65625 C 7.390625 -55.0625 8.929688 -63.253906 12.015625 -70.234375 C 15.109375 -77.210938 19.863281 -82.625 26.28125 -86.46875 C 32.695312 -90.320312 40.851562 -92.25 50.75 -92.25 C 60.613281 -92.25 68.722656 -90.320312 75.078125 -86.46875 C 81.429688 -82.625 86.148438 -77.203125 89.234375 -70.203125 C 92.328125 -63.203125 93.875 -54.976562 93.875 -45.53125 Z M 27.578125 -45.53125 C 27.578125 -39.195312 28.375 -33.738281 29.96875 -29.15625 C 31.570312 -24.582031 34.070312 -21.0625 37.46875 -18.59375 C 40.863281 -16.132812 45.253906 -14.90625 50.640625 -14.90625 C 56.097656 -14.90625 60.523438 -16.132812 63.921875 -18.59375 C 67.316406 -21.0625 69.789062 -24.582031 71.34375 -29.15625 C 72.90625 -33.738281 73.6875 -39.195312 73.6875 -45.53125 C 73.6875 -55.0625 71.90625 -62.5625 68.34375 -68.03125 C 64.78125 -73.5 58.914062 -76.234375 50.75 -76.234375 C 45.332031 -76.234375 40.914062 -75 37.5 -72.53125 C 34.082031 -70.0625 31.570312 -66.539062 29.96875 -61.96875 C 28.375 -57.394531 27.578125 -51.914062 27.578125 -45.53125 Z M 27.578125 -45.53125 "/></g><g transform="translate(833.079256, 799.278007)"><path d="M 49.890625 0 L 28.015625 -71.265625 L 27.453125 -71.265625 C 27.535156 -69.566406 27.671875 -67.003906 27.859375 -63.578125 C 28.046875 -60.160156 28.222656 -56.523438 28.390625 -52.671875 C 28.554688 -48.828125 28.640625 -45.351562 28.640625 -42.25 L 28.640625 0 L 11.4375 0 L 11.4375 -90.828125 L 37.65625 -90.828125 L 59.140625 -21.375 L 59.515625 -21.375 L 82.3125 -90.828125 L 108.53125 -90.828125 L 108.53125 0 L 90.578125 0 L 90.578125 -42.984375 C 90.578125 -45.847656 90.628906 -49.140625 90.734375 -52.859375 C 90.835938 -56.585938 90.972656 -60.140625 91.140625 -63.515625 C 91.304688 -66.898438 91.429688 -69.441406 91.515625 -71.140625 L 90.953125 -71.140625 L 67.53125 0 Z M 49.890625 0 "/></g></g><g fill="#112554"><g transform="translate(953.050727, 799.278007)"><path d="M 36.40625 -92.015625 C 41.625 -92.015625 46.4375 -91.203125 50.84375 -89.578125 C 55.257812 -87.960938 58.789062 -85.53125 61.4375 -82.28125 C 64.09375 -79.03125 65.421875 -74.960938 65.421875 -70.078125 C 65.421875 -66.429688 64.703125 -63.238281 63.265625 -60.5 C 61.835938 -57.769531 59.898438 -55.378906 57.453125 -53.328125 C 55.015625 -51.285156 52.242188 -49.5 49.140625 -47.96875 C 52.367188 -46.269531 55.429688 -44.289062 58.328125 -42.03125 C 61.234375 -39.769531 63.609375 -37.128906 65.453125 -34.109375 C 67.296875 -31.085938 68.21875 -27.566406 68.21875 -23.546875 C 68.21875 -18.492188 66.867188 -14.113281 64.171875 -10.40625 C 61.484375 -6.695312 57.753906 -3.828125 52.984375 -1.796875 C 48.222656 0.234375 42.695312 1.25 36.40625 1.25 C 29.613281 1.25 23.832031 0.273438 19.0625 -1.671875 C 14.300781 -3.617188 10.675781 -6.40625 8.1875 -10.03125 C 5.707031 -13.65625 4.46875 -17.992188 4.46875 -23.046875 C 4.46875 -27.191406 5.242188 -30.796875 6.796875 -33.859375 C 8.347656 -36.921875 10.445312 -39.5625 13.09375 -41.78125 C 15.75 -44 18.675781 -45.894531 21.875 -47.46875 C 19.175781 -49.164062 16.71875 -51.085938 14.5 -53.234375 C 12.289062 -55.390625 10.53125 -57.851562 9.21875 -60.625 C 7.914062 -63.40625 7.265625 -66.597656 7.265625 -70.203125 C 7.265625 -75.003906 8.617188 -79.019531 11.328125 -82.25 C 14.046875 -85.476562 17.617188 -87.910156 22.046875 -89.546875 C 26.484375 -91.191406 31.269531 -92.015625 36.40625 -92.015625 Z M 22.234375 -24.171875 C 22.234375 -20.898438 23.40625 -18.195312 25.75 -16.0625 C 28.09375 -13.925781 31.5625 -12.859375 36.15625 -12.859375 C 40.914062 -12.859375 44.476562 -13.882812 46.84375 -15.9375 C 49.207031 -17.988281 50.390625 -20.691406 50.390625 -24.046875 C 50.390625 -26.359375 49.710938 -28.382812 48.359375 -30.125 C 47.015625 -31.863281 45.328125 -33.425781 43.296875 -34.8125 C 41.265625 -36.207031 39.21875 -37.503906 37.15625 -38.703125 L 35.46875 -39.578125 C 32.820312 -38.367188 30.515625 -37.019531 28.546875 -35.53125 C 26.578125 -34.039062 25.03125 -32.363281 23.90625 -30.5 C 22.789062 -28.632812 22.234375 -26.523438 22.234375 -24.171875 Z M 36.28125 -77.96875 C 33.132812 -77.96875 30.523438 -77.160156 28.453125 -75.546875 C 26.378906 -73.929688 25.34375 -71.65625 25.34375 -68.71875 C 25.34375 -66.644531 25.847656 -64.832031 26.859375 -63.28125 C 27.878906 -61.726562 29.226562 -60.367188 30.90625 -59.203125 C 32.582031 -58.046875 34.414062 -56.96875 36.40625 -55.96875 C 38.3125 -56.882812 40.09375 -57.898438 41.75 -59.015625 C 43.40625 -60.140625 44.75 -61.488281 45.78125 -63.0625 C 46.820312 -64.632812 47.34375 -66.519531 47.34375 -68.71875 C 47.34375 -71.65625 46.296875 -73.929688 44.203125 -75.546875 C 42.109375 -77.160156 39.46875 -77.96875 36.28125 -77.96875 Z M 36.28125 -77.96875 "/></g></g></svg>
+        </a>
+
+        <!-- Desktop nav -->
+        <div class="hidden lg:flex items-center gap-8">
+          <a href="#prinosy" class="text-sm font-medium text-slate-600 hover:text-navy transition-colors">Přínosy</a>
+          <a href="#jak-to-funguje" class="text-sm font-medium text-slate-600 hover:text-navy transition-colors">Jak to funguje</a>
+          <a href="#faq" class="text-sm font-medium text-slate-600 hover:text-navy transition-colors">FAQ</a>
+          <a href="#kontakt" class="inline-flex items-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg hover:bg-navy-light transition-all duration-200 shadow-sm">
+            Konzultace zdarma
+          </a>
+        </div>
+
+        <!-- Mobile toggle -->
+        <button id="menu-toggle" class="lg:hidden p-2 text-navy" aria-label="Otevřít menu">
+          <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+        </button>
+      </div>
+
+      <!-- Mobile menu -->
+      <div id="mobile-menu" class="hidden lg:hidden pb-4 border-t border-slate-300/60 bg-slate-200">
+        <div class="flex flex-col gap-1 pt-4">
+          <a href="#prinosy" class="mobile-link px-3 py-2.5 text-sm font-medium text-slate-600 hover:text-navy hover:bg-white rounded-lg transition-colors">Přínosy</a>
+          <a href="#jak-to-funguje" class="mobile-link px-3 py-2.5 text-sm font-medium text-slate-600 hover:text-navy hover:bg-white rounded-lg transition-colors">Jak to funguje</a>
+          <a href="#faq" class="mobile-link px-3 py-2.5 text-sm font-medium text-slate-600 hover:text-navy hover:bg-white rounded-lg transition-colors">FAQ</a>
+          <a href="#kontakt" class="mobile-link mt-2 mx-3 text-center px-5 py-2.5 bg-navy text-white text-sm font-semibold rounded-lg">Konzultace zdarma</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ═══ SNAP CONTAINER (desktop) ═══ -->
+  <div id="snap-container">
+
+    <!-- ── HERO ── -->
+    <section class="snap-section !pt-16 !pb-8 sm:!pt-[clamp(5rem,8vh,7rem)] sm:!pb-[clamp(3rem,6vh,5rem)] justify-start sm:justify-center items-center px-4 md:px-8 relative hero-glow">
+      <div class="relative z-10 max-w-3xl mx-auto w-full text-center pt-2 pb-12 sm:pt-28 sm:pb-24" data-animate>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-navy leading-tight tracking-tight mb-6">
+          Vracíme firmám desítky<br class="hidden sm:block"> hodin měsíčně.
+          <span class="text-navy-light"> Automaticky.</span>
+        </h1>
+        <p class="text-lg sm:text-xl text-slate-500 leading-relaxed mb-10 max-w-xl mx-auto">
+          Zbavte svůj tým rutinní práce, přepisování dat a chaosu. Navrhneme a postavíme digitální ekosystém, který pracuje za vás – 24/7, bez chyb a s maximální efektivitou.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <a href="#kontakt" class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-navy text-white font-semibold rounded-xl hover:bg-navy-light transition-all duration-200 shadow-lg shadow-navy/20 hover:-translate-y-0.5">
+            Chci ušetřit čas
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+          <a href="#jak-to-funguje" class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white border-2 border-slate-300 text-navy font-semibold rounded-xl hover:border-navy-light hover:shadow-md transition-all duration-200">
+            Jak to funguje
+          </a>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pt-8 border-t border-slate-300/60">
+          <div>
+            <p class="text-2xl sm:text-3xl font-bold text-navy">30+</p>
+            <p class="text-sm text-slate-400 mt-1">hodin ušetřeno / měsíc</p>
+          </div>
+          <div class="w-px h-10 bg-slate-300/60 hidden sm:block"></div>
+          <div>
+            <p class="text-2xl sm:text-3xl font-bold text-navy">98 %</p>
+            <p class="text-sm text-slate-400 mt-1">méně chyb v procesech</p>
+          </div>
+          <div class="w-px h-10 bg-slate-300/60 hidden sm:block"></div>
+          <div>
+            <p class="text-2xl sm:text-3xl font-bold text-navy">24/7</p>
+            <p class="text-sm text-slate-400 mt-1">nepřetržitý provoz</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── BENEFITS ── -->
+    <section id="prinosy" class="snap-section px-4 md:px-8 !py-10 !pt-12 md:!py-12 md:!pt-14">
+      <div class="max-w-5xl mx-auto w-full flex flex-col justify-center gap-10 lg:gap-14 h-full">
+
+        <div data-animate class="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+          <div class="flex items-center justify-center py-6">
+            <i data-lucide="clock" class="w-20 h-20 sm:w-24 sm:h-24 text-slate-300"></i>
+          </div>
+          <div>
+            <p class="text-slate-600 leading-relaxed mb-3">Donedávna platilo, že zbavit se rutinní práce znamenalo najmout dalšího člověka. Přepisování dat, sledování termínů, odpovídání na opakující se dotazy – na nic jiného prostě čas nebyl.</p>
+            <p class="text-navy font-semibold">S AI automatizací tohle patří minulosti. Práce, která vám brala hodiny, je hotová za vteřiny.</p>
+          </div>
+        </div>
+
+        <div data-animate class="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+          <div class="md:order-2 flex items-center justify-center py-6">
+            <i data-lucide="shield-check" class="w-20 h-20 sm:w-24 sm:h-24 text-slate-300"></i>
+          </div>
+          <div class="md:order-1">
+            <p class="text-slate-600 leading-relaxed mb-3">Unavený člověk udělá chybu. Systém ne. Automatizace běží přesně podle nastavených pravidel – bez výjimek, bez přehlédnutí, bez „zapomněl jsem".</p>
+            <p class="text-navy font-semibold">Vaše procesy fungují stejně dobře ve 3 ráno jako v 9 ráno.</p>
+          </div>
+        </div>
+
+        <div data-animate class="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+          <div class="flex items-center justify-center py-6">
+            <i data-lucide="users" class="w-20 h-20 sm:w-24 sm:h-24 text-slate-300"></i>
+          </div>
+          <div>
+            <p class="text-slate-600 leading-relaxed mb-3">AI agenti dnes dokážou víc než jen automatizovat jednoduché úkony. Vyhodnocují situace, rozhodují se a reagují – jako plnohodnotný člen týmu, který nikdy nespí.</p>
+            <p class="text-navy font-semibold">Vaši lidé se mohou soustředit na to, co skutečně vyžaduje lidský úsudek.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── HOW IT WORKS ── -->
+    <section id="jak-to-funguje" class="snap-section px-4 md:px-8 !py-10 !pt-12 md:!py-12 md:!pt-14">
+      <div class="max-w-3xl mx-auto w-full flex flex-col justify-center h-full">
+        <div class="text-center mb-8" data-animate>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-navy tracking-tight mb-3">Jak probíhá spolupráce</h2>
+        </div>
+        <div class="relative" data-animate>
+          <div class="absolute left-7 top-0 bottom-0 w-0.5 bg-slate-300"></div>
+
+          <div class="relative flex gap-6 mb-5">
+            <div class="relative z-10 w-14 h-14 bg-navy rounded-xl flex items-center justify-center shrink-0 shadow-md">
+              <i data-lucide="message-circle" class="w-6 h-6 text-white"></i>
+            </div>
+            <div class="bg-white border border-slate-200/50 rounded-2xl px-6 py-4 shadow-sm flex-1">
+              <h3 class="text-base font-bold text-navy mb-1">Úvodní konzultace (15 min)</h3>
+              <p class="text-slate-500 text-sm leading-relaxed">Nezávazná online schůzka nebo osobní setkání. Pobavíme se o tom, jak vaše firma funguje a kde trávíte nejvíce času rutinou.</p>
+            </div>
+          </div>
+
+          <div class="relative flex gap-6 mb-5">
+            <div class="relative z-10 w-14 h-14 bg-navy rounded-xl flex items-center justify-center shrink-0 shadow-md">
+              <i data-lucide="search" class="w-6 h-6 text-white"></i>
+            </div>
+            <div class="bg-white border border-slate-200/50 rounded-2xl px-6 py-4 shadow-sm flex-1">
+              <h3 class="text-base font-bold text-navy mb-1">Identifikace příležitostí</h3>
+              <p class="text-slate-500 text-sm leading-relaxed">Detailně se podíváme na vaše procesy a identifikujeme místa, kde by AI automatizace dávala největší smysl – aby se váš tým mohl věnovat důležitějším věcem.</p>
+            </div>
+          </div>
+
+          <div class="relative flex gap-6 mb-5">
+            <div class="relative z-10 w-14 h-14 bg-navy rounded-xl flex items-center justify-center shrink-0 shadow-md">
+              <i data-lucide="file-check" class="w-6 h-6 text-white"></i>
+            </div>
+            <div class="bg-white border border-slate-200/50 rounded-2xl px-6 py-4 shadow-sm flex-1">
+              <h3 class="text-base font-bold text-navy mb-1">Návrh řešení na míru</h3>
+              <p class="text-slate-500 text-sm leading-relaxed">Předložíme jasný plán s odhadem úspor a cenou. Žádné skryté náklady – vy rozhodnete, zda chcete pokračovat.</p>
+            </div>
+          </div>
+
+          <div class="relative flex gap-6">
+            <div class="relative z-10 w-14 h-14 bg-navy rounded-xl flex items-center justify-center shrink-0 shadow-md">
+              <i data-lucide="rocket" class="w-6 h-6 text-white"></i>
+            </div>
+            <div class="bg-white border border-slate-200/50 rounded-2xl px-6 py-4 shadow-sm flex-1">
+              <h3 class="text-base font-bold text-navy mb-1">Nasazení &amp; Provoz</h3>
+              <p class="text-slate-500 text-sm leading-relaxed">Nasadíme systém do ostrého provozu a pravidelně ho budeme kontrolovat a optimalizovat, aby fungoval spolehlivě dlouhodobě.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FAQ ── -->
+    <section id="faq" class="snap-section px-4 md:px-8 !py-10 !pt-12 md:!py-12 md:!pt-14">
+      <div class="max-w-3xl mx-auto w-full flex flex-col justify-center h-full">
+        <div class="text-center mb-7" data-animate>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-navy tracking-tight mb-3">Často kladené otázky</h2>
+          <p class="text-slate-500 text-base sm:text-lg leading-relaxed">Odpovědi na to, co firmy zajímá nejčastěji před první konzultací.</p>
+        </div>
+        <div class="space-y-2.5" data-animate>
+          <div class="accordion-item open bg-white border border-slate-200/50 rounded-2xl overflow-hidden shadow-sm">
+            <button class="accordion-trigger w-full flex items-center justify-between gap-4 px-6 py-4 text-left">
+              <span class="font-semibold text-navy text-sm sm:text-base">Jak dlouho trvá implementace?</span>
+              <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-slate-400 shrink-0"></i>
+            </button>
+            <div class="accordion-content">
+              <p class="px-6 pb-4 text-slate-500 text-sm leading-relaxed">První funkční automatizace nasazujeme obvykle do 14 dnů. Kompletní propojení firemních systémů a integraci AI pak dokončujeme v horizontu jednoho měsíce. Celý projekt záměrně fázujeme, abyste přínos automatizace viděli v praxi co nejdříve.</p>
+            </div>
+          </div>
+          <div class="accordion-item bg-white border border-slate-200/50 rounded-2xl overflow-hidden shadow-sm">
+            <button class="accordion-trigger w-full flex items-center justify-between gap-4 px-6 py-4 text-left">
+              <span class="font-semibold text-navy text-sm sm:text-base">Budeme muset měnit naše stávající programy?</span>
+              <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-slate-400 shrink-0"></i>
+            </button>
+            <div class="accordion-content">
+              <p class="px-6 pb-4 text-slate-500 text-sm leading-relaxed">Není to nutné. Naším cílem je propojit systémy, které již ve firmě úspěšně používáte – od ERP a CRM systémů až po e-shopy nebo interní nástroje. Využíváme k tomu moderní integrační platformy, které vaše programy propojí přes API, takže si data začnou předávat samy a váš tým se nemusí učit nic nového.</p>
+            </div>
+          </div>
+          <div class="accordion-item bg-white border border-slate-200/50 rounded-2xl overflow-hidden shadow-sm">
+            <button class="accordion-trigger w-full flex items-center justify-between gap-4 px-6 py-4 text-left">
+              <span class="font-semibold text-navy text-sm sm:text-base">Jak jsou řešeny případné výpadky nebo chyby v automatizaci?</span>
+              <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-slate-400 shrink-0"></i>
+            </button>
+            <div class="accordion-content">
+              <p class="px-6 pb-4 text-slate-500 text-sm leading-relaxed">Všechny automatizační scénáře stavíme s pokročilým ošetřením chyb. Pokud dojde k výpadku na straně některé ze spojených aplikací, systém data neztratí, ale bezpečně je zastaví ve frontě. Jakmile se provoz aplikace obnoví, proces se automaticky dokončí. O každé chybě navíc okamžitě dostáváme upozornění, abychom ji mohli ihned vyřešit.</p>
+            </div>
+          </div>
+          <div class="accordion-item bg-white border border-slate-200/50 rounded-2xl overflow-hidden shadow-sm">
+            <button class="accordion-trigger w-full flex items-center justify-between gap-4 px-6 py-4 text-left">
+              <span class="font-semibold text-navy text-sm sm:text-base">Je integrace AI bezpečná z hlediska firemních dat a know-how?</span>
+              <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-slate-400 shrink-0"></i>
+            </button>
+            <div class="accordion-content">
+              <p class="px-6 pb-4 text-slate-500 text-sm leading-relaxed">Bezpečnost dat je pro nás prioritou. Využíváme výhradně oficiální a zabezpečená firemní API rozhraní s šifrováním. Vaše dokumenty, databáze ani interní know-how se nikdy nepoužívají k veřejnému trénování modelů umělé inteligence. Data slouží pouze pro potřeby daného úkonu a nikde se neukládají.</p>
+            </div>
+          </div>
+          <div class="accordion-item bg-white border border-slate-200/50 rounded-2xl overflow-hidden shadow-sm">
+            <button class="accordion-trigger w-full flex items-center justify-between gap-4 px-6 py-4 text-left">
+              <span class="font-semibold text-navy text-sm sm:text-base">Jakým způsobem naceňujete realizaci automatizací?</span>
+              <i data-lucide="chevron-down" class="accordion-icon w-5 h-5 text-slate-400 shrink-0"></i>
+            </button>
+            <div class="accordion-content">
+              <p class="px-6 pb-4 text-slate-500 text-sm leading-relaxed">Cenu kalkulujeme individuálně podle složitosti propojovaných procesů a počtu kroků v automatizaci. Každé spolupráci předchází úvodní konzultace a základní analýza vašich současných procesů. Na základě těchto informací od nás obdržíte fixní rozpočet spolu s odhadem návratnosti investice (ROI).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONTACT ── -->
+    <section id="kontakt" class="snap-section !pt-28 lg:!pt-32 !pb-14 px-4 md:px-8 bg-slate-950 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-blue-950/30 via-slate-950 to-slate-950 pointer-events-none"></div>
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-blue-600/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 max-w-3xl mx-auto w-full">
+        <div class="flex flex-col items-center gap-6 lg:gap-7 text-center">
+
+          <!-- Section heading -->
+          <div data-animate class="w-full max-w-2xl">
+            <div class="text-center">
+              <h2 class="text-3xl sm:text-4xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight mb-3">Získejte analýzu procesů zdarma</h2>
+              <p class="text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto">Napište nám, co vás ve firmě nejvíc brzdí. Ozveme se vám zpět a navrhneme konkrétní řešení.</p>
+            </div>
+          </div>
+
+          <!-- Contact form -->
+          <div data-animate class="flex justify-center w-full">
+            <form id="contact-form" action="https://formspree.io/f/mwvdqyav" method="POST" class="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 sm:p-7 lg:p-8 backdrop-blur-sm w-full max-w-2xl flex flex-col justify-center shadow-2xl shadow-black/20">
+              <div id="form-success" class="hidden text-center py-10">
+                <div class="w-14 h-14 mx-auto bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mb-4">
+                  <i data-lucide="check" class="w-7 h-7 text-emerald-400"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Děkujeme za zprávu!</h3>
+                <p class="text-slate-400 text-sm">Ozveme se vám do 24 hodin.</p>
+              </div>
+              <div id="form-fields" class="grid gap-3.5 sm:grid-cols-2 text-left">
+                <div>
+                  <label class="block text-xs font-medium text-slate-300 mb-1.5">Jméno</label>
+                  <input type="text" name="name" required placeholder="Jan Novák" class="w-full px-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-300 mb-1.5">E-mail</label>
+                  <input type="email" name="email" required placeholder="jan@firma.cz" class="w-full px-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-medium text-slate-300 mb-1.5">Název firmy</label>
+                  <input type="text" name="company" required placeholder="Vaše firma s.r.o." class="w-full px-4 py-3 bg-slate-900/60 border border-slate-800 rounded-xl text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-medium text-slate-300 mb-1.5">Co chcete automatizovat</label>
+                  <textarea name="message" rows="3" required placeholder="Popište nám, co vás ve firmě nejvíc brzdí..." class="w-full px-4 py-3 min-h-[7.5rem] bg-slate-900/60 border border-slate-800 rounded-xl text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-all resize-none"></textarea>
+                </div>
+                <button type="submit" class="sm:col-span-2 w-full inline-flex items-center justify-center gap-2 px-7 py-3 bg-blue-500 hover:bg-blue-400 text-white text-sm font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-blue-500/25 hover:-translate-y-0.5">
+                  Odeslat nezávaznou poptávku
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+                <p class="sm:col-span-2 text-xs text-slate-500 text-center">Odesláním souhlasíte se zpracováním osobních údajů dle GDPR.</p>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ── -->
+    <footer class="bg-navy text-white py-10" style="scroll-snap-align:end; scroll-snap-stop:normal;">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-center sm:text-left">
+            <p class="font-bold text-base tracking-tight mb-0.5">AUTOM8</p>
+            <p class="text-sm text-white/50">&copy; 2026 Všechna práva vyhrazena.</p>
+          </div>
+          <div class="flex items-center gap-5">
+            <button id="privacy-open" type="button" class="text-sm text-white/60 hover:text-white transition-colors">Ochrana osobních údajů</button>
+            <a href="https://www.instagram.com/autom8cz?igsh=MTU5czl5NmxjMDh0bA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram AUTOM8" class="w-8 h-8 bg-white/10 border border-white/30 rounded-lg flex items-center justify-center hover:bg-white/20 hover:border-white/50 transition-colors">
+              <svg class="w-4 h-4 text-white" viewBox="0 0 256 256" aria-hidden="true" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M128,84a44,44,0,1,0,44,44A44.04978,44.04978,0,0,0,128,84Zm0,80a36,36,0,1,1,36-36A36.04061,36.04061,0,0,1,128,164ZM172,32H84A52.059,52.059,0,0,0,32,84v88a52.059,52.059,0,0,0,52,52h88a52.059,52.059,0,0,0,52-52V84A52.059,52.059,0,0,0,172,32Zm44,140a44.04978,44.04978,0,0,1-44,44H84a44.04978,44.04978,0,0,1-44-44V84A44.04978,44.04978,0,0,1,84,40h88a44.04978,44.04978,0,0,1,44,44ZM188,76a8,8,0,1,1-8-8A8.00917,8.00917,0,0,1,188,76Z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div id="privacy-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-950/80 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
+      <div class="w-full max-w-2xl rounded-2xl border border-slate-700 bg-slate-900 p-6 text-left shadow-2xl shadow-black/40">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 id="privacy-title" class="text-xl font-bold text-white">Ochrana osobních údajů</h2>
+            <p class="mt-2 text-sm leading-relaxed text-slate-400">Osobní údaje z kontaktního formuláře používáme pouze ke zpracování vaší poptávky a navázání komunikace. Údaje nepředáváme třetím stranám pro marketingové účely.</p>
+          </div>
+          <button type="button" data-privacy-close class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white" aria-label="Zavřít ochranu osobních údajů">
+            <i data-lucide="x" class="h-5 w-5"></i>
+          </button>
+        </div>
+        <div class="mt-5 space-y-3 text-sm leading-relaxed text-slate-400">
+          <p><strong class="text-slate-200">Jaké údaje zpracováváme:</strong> jméno, e-mail, název firmy a zprávu, kterou nám odešlete.</p>
+          <p><strong class="text-slate-200">Účel zpracování:</strong> odpověď na poptávku, příprava konzultace a návrh vhodného řešení.</p>
+          <p><strong class="text-slate-200">Doba uchování:</strong> pouze po dobu potřebnou k vyřízení poptávky a případné navazující komunikaci.</p>
+          <p>V případě dotazů k osobním údajům nás kontaktujte přes formulář na této stránce.</p>
+        </div>
+        <button type="button" data-privacy-close class="mt-6 w-full rounded-xl bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-400">Rozumím</button>
+      </div>
+    </div>
+
+  </div><!-- /#snap-container -->
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+
+    // Navbar blur on scroll
+    const navbar = document.getElementById('navbar');
+    const container = document.getElementById('snap-container');
+    container.addEventListener('scroll', () => {
+      navbar.classList.toggle('nav-scrolled', container.scrollTop > 20);
+    });
+
+    // Mobile menu
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon   = document.getElementById('menu-icon');
+    menuToggle.addEventListener('click', () => {
+      const isOpen = !mobileMenu.classList.contains('hidden');
+      mobileMenu.classList.toggle('hidden');
+      menuIcon.setAttribute('data-lucide', isOpen ? 'menu' : 'x');
+      lucide.createIcons();
+    });
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        menuIcon.setAttribute('data-lucide', 'menu');
+        lucide.createIcons();
+      });
+    });
+
+    // Logo → scroll to top
+    document.getElementById('logo-link').addEventListener('click', e => {
+      e.preventDefault();
+      container.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Nav anchor scrolling → scroll the container, not window
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const href = a.getAttribute('href');
+        if (href === '#') {
+          e.preventDefault();
+          return;
+        }
+        const id = href.slice(1);
+        const target = document.getElementById(id);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Accordion
+    document.querySelectorAll('.accordion-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const item = trigger.closest('.accordion-item');
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+
+    // Animate on scroll (observe within snap container)
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { root: container, threshold: 0.1 });
+    document.querySelectorAll('[data-animate]').forEach(el => observer.observe(el));
+
+    // Privacy modal
+    const privacyOpen = document.getElementById("privacy-open");
+    const privacyModal = document.getElementById("privacy-modal");
+    const openPrivacy = () => {
+      privacyModal.classList.remove("hidden");
+      privacyModal.classList.add("flex");
+    };
+    const closePrivacy = () => {
+      privacyModal.classList.add("hidden");
+      privacyModal.classList.remove("flex");
+    };
+    privacyOpen.addEventListener("click", openPrivacy);
+    document.querySelectorAll("[data-privacy-close]").forEach(button => {
+      button.addEventListener("click", closePrivacy);
+    });
+    privacyModal.addEventListener("click", e => {
+      if (e.target === privacyModal) closePrivacy();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && !privacyModal.classList.contains("hidden")) closePrivacy();
+    });
+
+    // Contact form → Formspree
+    document.getElementById('contact-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = e.target;
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = 'Odesílám…';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (res.ok) {
+          document.getElementById('form-fields').classList.add('hidden');
+          document.getElementById('form-success').classList.remove('hidden');
+          lucide.createIcons();
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = 'Odeslat nezávaznou poptávku';
+          alert('Odeslání se nepodařilo, zkuste to prosím znovu.');
+        }
+      } catch {
+        btn.disabled = false;
+        btn.innerHTML = 'Odeslat nezávaznou poptávku';
+        alert('Chyba sítě, zkuste to prosím znovu.');
+      }
+    });
+  </script>
+</body>
+</html>
